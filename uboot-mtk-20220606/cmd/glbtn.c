@@ -59,7 +59,7 @@ static int do_glbtn(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[
 
 	button_label = env_get("glbtn_key");
 	if (!button_label)
-		button_label = "reset";
+		button_label = "mesh";
 
 	ret = button_get_by_label(button_label, &dev);
 	if (ret) {
