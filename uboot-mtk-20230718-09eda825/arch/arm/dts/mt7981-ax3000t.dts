@@ -7,7 +7,7 @@
 / {
 	#address-cells = <1>;
 	#size-cells = <1>;
-	model = "mt7981-clt-r30b1";
+	model = "mt7981-xiaomi-ax3000t";
 	compatible = "mediatek,mt7981", "mediatek,mt7981-rfb";
 
 	chosen {
@@ -17,30 +17,35 @@
 
 	config {
 		bootcmd = "mtkboardboot";
-		blink_led = "red:system";
-		system_led = "green:system";
+		blink_led = "yellow:system";
+		system_led = "blue:system";
 	};
 
 	mtd-layout {
 		layout@0 {
 			label = "default";
-			// mtd layout for clt_r30b1 stock ubi or openwrt-stock/immortalwrt-stock firmware
+			// mtd layout for xiaomi stock ubi or openwrt-stock/immortalwrt-stock firmware
+			cmdline = "console=ttyS0,115200n1 loglevel=8 swiotlb=512 firmware=0 mtd=ubi uart_en=1";
 			mtdids = "nmbm0=nmbm0";
-			mtdparts = "nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),64M(ubi),32M(data)";
+			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),34816k(ubi_kernel),79872k(ubi),256k(KF)";
+			boot_part = "ubi_kernel"; // ubi boot part, default is "ubi"
+			factory_part = "ubi_kernel"; // factory firmware write part, default is "ubi"
+			sysupgrade_kernel_ubipart = "ubi_kernel"; // sysupgrade kernel write part (ubi volume: kernel), default is "ubi"
+			sysupgrade_rootfs_ubipart = "ubi"; // sysupgrade rootfs write part (ubi volume: rootfs, rootfs_data)
 		};
 
 		layout@1 {
 			label = "immortalwrt-112m";
 			// mtd layout for immortalwrt/openwrt 112M ubi firmware
 			mtdids = "nmbm0=nmbm0";
-			mtdparts = "nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),112M(ubi)";
+			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),112m(ubi),256k(KF)";
 		};
 
 		layout@2 {
 			label = "qwrt";
 			// mtd layout for lean qwrt
 			mtdids = "nmbm0=nmbm0";
-			mtdparts = "nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),1024k(rsv0),110M(ubi)";
+			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),100m(ubi),12m(data),256k(KF)";
 		};
 	};
 
@@ -50,13 +55,13 @@
 		reset-button {
 			label = "reset";
 			linux,code = <KEY_RESTART>;
-			gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
 		};
 
 		mesh-button {
 			label = "mesh";
 			linux,code = <BTN_9>;
-			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
 		};
 	};
 
@@ -64,40 +69,13 @@
 		compatible = "gpio-leds";
 
 		led@0 {
-			label = "red:power";
-			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
+			label = "blue:system";
+			gpios = <&gpio 9 GPIO_ACTIVE_LOW>;
 		};
 
-		system_led: led@1 {
-			label = "red:wan";
-			gpios = <&gpio 5 GPIO_ACTIVE_LOW>;
-		};
-
-		led@2 {
-			label = "green:wan";
-			gpios = <&gpio 6 GPIO_ACTIVE_LOW>;
-		};
-
-		led@3 {
-			label = "green:system";
-			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
-			default-state = "on";
-			linux,default-trigger = "default-on";
-		};
-
-		led@4 {
-			label = "blue:internet";
-			gpios = <&gpio 11 GPIO_ACTIVE_LOW>;
-		};
-
-		led@5 {
-			label = "blue:mesh";
-			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
-		};
-
-		led@6 {
-			label = "green:wifi";
-			gpios = <&gpio 34 GPIO_ACTIVE_LOW>;
+		led@1 {
+			label = "yellow:system";
+			gpios = <&gpio 10 GPIO_ACTIVE_LOW>;
 		};
 	};
 
